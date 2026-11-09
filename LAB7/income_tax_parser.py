@@ -1,26 +1,58 @@
+
 def clean_pan(pan):
     """
     Removes spaces from a PAN and upper-cases it.
-    Assumes pan is a non-empty string.
+    Returns an empty string for invalid input.
     """
+    if not isinstance(pan, str):
+        return ""
+
     return pan.strip().replace(' ', '').upper()
+
 
 def parse_amount(text):
     """
     Converts an amount such as 'Rs 12,50,000' into an int.
-    Assumes only digits remain after removing 'Rs', commas and spaces.
+    Returns 0 for invalid input.
     """
-    text = text.replace('Rs', '').replace(',', '').strip()
-    return int(text)
+    if not isinstance(text, str):
+        return 0
+
+    text = text.lower().replace('rs', '').replace(',', '').strip()
+
+    try:
+        return int(text)
+    except ValueError:
+        return 0
+
 
 def parse_tax_slab(line):
     """
     Parses 'LOW-HIGH:RATE' into a (low, high, rate) tuple.
-    Assumes the line is always in that exact format.
+    Returns (0, 0, 0) for invalid input.
     """
-    limits, rate = line.split(':')
-    low, high = limits.split('-')
-    return int(low), int(high), int(rate)
+    if not isinstance(line, str):
+        return (0, 0, 0)
+
+    try:
+        parts = line.split(':')
+
+        if len(parts) != 2:
+            return (0, 0, 0)
+
+        limits, rate = parts
+        limits = limits.split('-')
+
+        if len(limits) != 2:
+            return (0, 0, 0)
+
+        low, high = limits
+
+        return int(low), int(high), int(rate)
+
+    except ValueError:
+        return (0, 0, 0)
+
 
 def main():
     print("==== Running clean_pan ====")
@@ -34,6 +66,7 @@ def main():
     print("\n==== Running parse_tax_slab ====")
     value = input("Enter a tax slab as LOW-HIGH:RATE (e.g. 250000-500000:5): ")
     print("Tax slab (low, high, rate):", parse_tax_slab(value))
+
 
 if __name__ == "__main__":
     main()
